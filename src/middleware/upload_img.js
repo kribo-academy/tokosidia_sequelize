@@ -10,7 +10,7 @@ const multerStorage = multer.diskStorage({
     callback(null, './public/images/')
   },
   filename: (req, file, callback) => {
-    let file_name = `product_${Date.now()}${path.extname(file.originalname)}`
+    let file_name = `user_${Date.now()}${path.extname(file.originalname)}`
     callback(null, file_name)
   },
 })
@@ -42,7 +42,7 @@ const uploadImage = (req, res, next) => {
         } else if (err.code === 'wrongtype') {
           messages(res, 400, err)
         } else {
-          messages(res, 500, 'Something wrong when upload image')
+          messages(res, 500, 'Something wrong when upload image', err)
         }
       } else {
         next()

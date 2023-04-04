@@ -1,6 +1,5 @@
 import Product from '../models/products.js'
 import messages from '../utils/messages.js'
-import fs from 'fs'
 
 const createProduct = async (req, res) => {
   const body = req.body
