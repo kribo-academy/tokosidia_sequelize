@@ -69,7 +69,7 @@ const all = async (req, res) => {
       where: {
         email: { [Op.like]: `%${q}%` },
       },
-      offset: page === 1 ? 0 : (page - 1) * limit,
+      offset: page === 1 ? 0 : (page - 1) * per_page,
       limit: per_page,
       order: [['createdAt', order_by]],
     })
