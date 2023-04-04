@@ -72,12 +72,12 @@ const updated = async (req, res) => {
         if (fs.existsSync(path)) fs.unlinkSync(path) // delete old file
 
         await Users.update(data, { where: { id } })
-        messages(res, 200, 'Update user success')
+        messages(res, 201, 'Update user success')
       } else {
         delete data.image
 
         await Users.update(data, { where: { id } })
-        messages(res, 200, 'Update user success')
+        messages(res, 201, 'Update user success')
       }
     } else {
       const path = `./public/images/${file.filename}`
@@ -89,4 +89,25 @@ const updated = async (req, res) => {
   }
 }
 
-export { register, detail, updated }
+const deleted = async (req, res) => {
+  const id = req.params.id
+
+  try {
+    await Users.sync()
+    const checkUser = await Users.findOne({ where: { id } })
+
+    if (checkUser) {
+      const path = `./public/images/${checkUser.image}`
+
+      // check file existting image
+      if (fs.existsSync(path)) fs.unlinkSync(path) // delete file
+
+      await Users.destroy({ where: { id } })
+      messages(res, 200, 'Delete user success')
+    } else return messages(res, 400, `User not found`)
+  } catch (error) {
+    messages(res, 500, 'Internal server error')
+  }
+}
+
+export { register, detail, updated, deleted }
