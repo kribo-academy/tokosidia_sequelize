@@ -1,6 +1,7 @@
 import Users from '../models/users.js'
 import messages from '../utils/messages.js'
 import fs from 'fs'
+import { Op } from 'sequelize'
 
 const register = async (req, res) => {
   const body = req.body
@@ -50,6 +51,44 @@ const detail = async (req, res) => {
 
       return messages(res, 200, 'Detail User', detail)
     } else return messages(res, 400, `User not found`)
+  } catch (error) {
+    messages(res, 500, 'Internal server error')
+  }
+}
+
+const all = async (req, res) => {
+  const q = req.query.q ? req.query.q : ''
+  const page = req.query.page ? parseInt(req.query.page) : 1
+  const per_page = req.query.per_page ? parseInt(req.query.per_page) : 10
+  const order_by = req.query.order_by ? req.query.order_by : 'ASC'
+
+  try {
+    await Users.sync()
+    const total = await Users.findAndCountAll()
+    const datas = await Users.findAll({
+      where: {
+        email: { [Op.like]: `%${q}%` },
+      },
+      offset: page === 1 ? 0 : (page - 1) * limit,
+      limit: per_page,
+      order: [['createdAt', order_by]],
+    })
+
+    const newData = datas.map((data) => {
+      const { id, email, image, createdAt, updatedAt } = data
+      return {
+        id,
+        email,
+        image,
+        createdAt,
+        updatedAt,
+      }
+    })
+
+    return messages(res, 200, 'Users', {
+      data: newData,
+      pagination: { page, per_page, total: total.count },
+    })
   } catch (error) {
     messages(res, 500, 'Internal server error')
   }
@@ -110,4 +149,4 @@ const deleted = async (req, res) => {
   }
 }
 
-export { register, detail, updated, deleted }
+export { register, detail, all, updated, deleted }
