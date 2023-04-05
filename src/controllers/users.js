@@ -109,15 +109,10 @@ const updated = async (req, res) => {
         const path = `./public/images/${checkUser.image}`
         // check file existting image
         if (fs.existsSync(path)) fs.unlinkSync(path) // delete old file
+      } else delete data.image
 
-        await Users.update(data, { where: { id } })
-        messages(res, 201, 'Update user success')
-      } else {
-        delete data.image
-
-        await Users.update(data, { where: { id } })
-        messages(res, 201, 'Update user success')
-      }
+      await Users.update(data, { where: { id } })
+      messages(res, 201, 'Update user success')
     } else {
       const path = `./public/images/${file.filename}`
       fs.unlinkSync(path) // delete file
